@@ -1,0 +1,320 @@
+$bgColorControls: rgba(84,84,84,0.6)
+$bgColorPlayerConrainer: #000
+$colorControlsBtn: #fff
+$bgProgress: #0075ff
+$bgBuffer: #777
+$bgTrack: #555
+$subtitle: #fff
+$subtitleZIndex: 2
+$tapColor: #fff
+
+html, body, div, span, p, audio, video
+    margin: 0
+    padding: 0
+    border: 0
+    font-size: 100%
+    font: inherit
+    vertical-align: baseline
+body
+    height: 100vh
+    background-color: #0075ff
+.video-list
+    display: flex
+    flex-direction: column
+    align-items: center
+.video-player-wrap
+    position: relative
+    width: 360px
+    height: 460px
+    background-color: $bgColorPlayerConrainer
+    margin-top: 20px
+    margin-bottom: 20px
+    video
+        width: 100%
+        height: 100%
+        position: absolute
+        top: 0px
+        left: 0px
+        z-index: 3
+        &::-webkit-media-controls
+            display: none!important
+        &::-webkit-media-controls-enclosure
+            display: none!important
+        &::cue
+            line-height: 1.5
+video::cue
+    color: $subtitle
+.video-player-controls
+    width: 100%
+    height: 32px
+    background-color: $bgColorControls
+    position: absolute
+    left: 0px
+    bottom: 0px
+    z-index: 5
+    display: flex
+    align-items: center
+    button
+        transform: scale(1)
+        transition: all 1s ease-out
+        &:hover
+            transform: scale(0.8)
+            transition: all 0.5s ease-out
+    button:active, button:focus
+        outline: none
+    button::-moz-focus-inner
+        border: 0
+
+.controls-btn
+    position: relative
+    width: 24px
+    height: 24px
+    border: none
+    background-color: transparent
+    cursor: pointer
+    & > svg
+        z-index: -1
+        position: relative
+        fill: $colorControlsBtn
+        width: 100%
+        height: 100%
+    & > img
+        z-index: -1
+        position: relative
+        width: 100%
+        height: 100%
+    &.videoFullscreenCancel svg polygon
+        fill: $colorControlsBtn
+.player-btn-left
+    padding-left: 6px
+    padding-right: 6px
+.player-btn-right
+    padding-left: 6px
+    padding-right: 6px
+    display: flex
+    align-items: center
+.player-track-container
+    width: 100%
+    height: 20px
+    z-index: 3
+    position: relative
+    .player-track-time
+        font-size: 10px
+        color: rgba(255,255,255, 0.5)
+        font-weight: 500
+        font-style: italic
+        position: absolute
+        left: 50%
+        z-index: 3
+        top: 50%
+        transform: translate(-50%, -50%)
+        -webkit-touch-callout: none
+        -webkit-user-select: none
+        -khtml-user-select: none
+        -moz-user-select: none
+        -ms-user-select: none
+        user-select: none
+    .player-track
+        width: 100%
+        height: 100%
+        z-index: 3
+        position: absolute
+        cursor: pointer
+        display: flex
+        align-items: center
+        justify-content: center
+    .player-track-amount
+        display: block
+        height: 100%
+        width: 0
+    .player-buffered
+        height: 100%
+        position: relative
+        background: $bgTrack
+        width: 100%
+        z-index: 2
+    .player-buffered-amount
+        display: block
+        height: 100%
+        background-color: $bgBuffer
+        width: 0
+    .player-progress
+        margin-top: -20px
+        height: 100%
+        position: relative
+        width: 100%
+        z-index: 2
+    .player-progress-amount
+        display: block
+        height: 100%
+        background-color: $bgProgress
+        width: 0
+.player-volume-container
+    position: relative
+.videoVolumeRange
+    font-size: 15px
+.player-volume-label
+    font-size: 12px
+    color: #fff
+    width: 32px
+    margin-left: 8px
+.player-volume-range-wrap
+    position: absolute
+    right: 0px
+    bottom: 42px
+    display: flex
+    align-items: center
+.overlay-play
+    position: absolute
+    left: 0px
+    top: 0px
+    width: 100%
+    height: 100%
+    display: flex
+    align-items: center
+    justify-content: center
+    z-index: 6
+    cursor: pointer
+    background: rgba(0, 0, 0,0.7)
+    .play-icon
+        width: 140px
+        height: 140px
+        text-align: center
+        border-radius: 140px
+        border: 4px solid #fff
+        position: relative
+        &::before
+            content: "►"
+            position: absolute
+            color: #fff
+            font-size: 130px
+            top: 50%
+            left: 50%
+            width: 110px
+            height: 158px
+            transform: translate(-50%, -50%)
+.player-subtitle-container
+    position: relative
+    .subtitle-list
+        position: absolute
+        width: 72px
+        height: auto
+        background-color: #000
+        right: 0%
+        bottom: 160%
+        padding: 12px
+        border-radius: 10px
+        z-index: $subtitleZIndex
+    .subtitle-item
+        color: #fff
+        font-size: 13px
+        padding: 4px
+        border-bottom: 1px solid #fff
+        font-weight: 600
+        cursor: pointer
+        transition: all 1s ease-out
+        border-radius: 2px
+        &:hover
+            background-color: $bgProgress
+            transition: all 1s ease-out
+        &.active
+            border-bottom: 1px solid $bgProgress
+            transition: all 1s ease-out
+    .btn-cc
+        font-size: 7px
+        color: #fff
+        border: 1px solid #fff
+        width: 16px
+        height: 16px
+        padding: 0
+        border-radius: 20px
+.br-moz
+    .player-subtitle-container
+        .btn-cc
+            font-size: 7px
+            width: 16px
+            height: 16px
+    .controls-btn
+        width: 20px
+        height: 20px
+    &.video-player-wrap
+        video
+            &::cue
+                line-height: 3
+    .overlay-play
+        .play-icon::before
+            height: 170px
+.player-btn-pp
+    margin-left: 4px
+    margin-right: 4px
+    align-items: center
+    justify-content: center
+    width: 26px
+    height: 26px
+    display: flex
+@media screen and (min-width: 992px)
+    .video-player-wrap
+        width: 800px
+        height: 600px
+    .player-track-container
+        .player-track-time
+            font-size: 16px
+    .controls-btn
+        width: 26px
+        height: 26px
+    .player-subtitle-container
+        .btn-cc
+            font-size: 9px
+            width: 20px
+            height: 20px
+.doubleTap
+    position: absolute
+    z-index: 4
+    width: 100px
+    height: 100%
+    top: 0
+    display: flex
+    align-items: center
+    justify-content: center
+    &Left
+        left: 0px
+    &Right
+        right: 0px
+    &.tap-active
+        .double-tap-icon-wrap
+            opacity: 1
+            visibility: visible
+            transition: all 300ms
+    .double-tap-icon-wrap
+        opacity: 0
+        visibility: hidden
+        display: flex
+        align-items: center
+        justify-content: center
+        transition: all 300ms
+        img
+            width: 26px
+            height: 26px
+        div
+            font-size: 18px
+            font-weight: bold
+            margin-left: 6px
+            margin-right: 6px
+            color: $tapColor
+.rot-180
+    transform: rotate(180deg)
+.playToTimeContainer
+    position: absolute
+    z-index: 10
+    background: #fff
+    left: 50%
+    top: 73%
+    transform: translate(-50%, -50%)
+    padding: 8px
+    border-radius: 5px
+    max-width: 112px
+    cursor: pointer
+    div
+        pointer-events: none
+
+@import ./range.scss
