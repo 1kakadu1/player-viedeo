@@ -37,6 +37,8 @@ export interface IVideoPlayerUI {
     unMount: () => void;
     controls: (container: HTMLDivElement | null, events: IEventsUI) => IElementsReturn;
     createUI: (events: IEventsUI) => IVideoPlayerElementsCreate;
+    overlayPlay: (events: IEventsUI) => IElementsReturn;
+    storeTimeBtn: (events: IEventsUI) => IElementsReturn;
 }
 
 export interface IFactoryEvent {

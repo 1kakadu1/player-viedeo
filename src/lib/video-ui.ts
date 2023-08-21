@@ -13,7 +13,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 	protected timeTrackOffset?: number | undefined;
 	private storeTime: number;
 	private utils: IVideoUtils;
-	private unMountList: { [key: string]: () => void } = {};
+	private unMountList: Array<() => void> = [];
 
 	constructor(videoContainer: HTMLDivElement | null, param: IVideoPlayerUIParam) {
 		this.container = videoContainer;
@@ -32,9 +32,9 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 	}
 
 	unMount = (): void => {
-		for (const key in this.unMountList) {
-			this.unMountList[key]();
-		}
+		this.unMountList.forEach((item) => {
+			item();
+		})
 	};
 
 	protected subtitles({
@@ -178,16 +178,19 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		const image_play = document.createElement("img");
 		image_play.src = `${this.icons}/play.svg`;
 		image_play.alt = 'play';
+		image_play.style.display = 'none';
 
 		const button_pause = document.createElement("button");
 		button_pause.classList.add('controls-btn', pause)
 		const image_pause = document.createElement("img");
 		image_pause.src = `${this.icons}/pause.svg`;
 		image_pause.alt = 'pause';
-		image_pause.style.display = 'none';
 
 		const buttons_pp_action = document.createElement("div");
 		button_pause.classList.add(`player-btn-pp`);
+
+		button_pause.appendChild(image_pause);
+		button_play.appendChild(image_play);
 
 		button_play.addEventListener("click", events["button_play"]);
 		button_pause.addEventListener("click", events["button_pause"]);
@@ -247,7 +250,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		const track_progress = document.createElement('div');
 		track_progress.classList.add("player-progress");
 		const track_progress_amount = document.createElement('span');
-		track_progress_amount.classList.add("player-buffered-amount", progress);
+		track_progress_amount.classList.add("player-progress-amount", progress);
 		track_progress.appendChild(track_progress_amount);
 		track_container_node.appendChild(track_progress);
 
@@ -270,47 +273,45 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		}
 	}
 
-	protected doubleTap(): IElementsReturn {
-		const uiClasses = {
-			doubleTapLeft: UiClasses.doubleTapLeft,
-			doubleTapRight: UiClasses.doubleTapRight,
-			doubleTap: UiClasses.doubleTap
-		};
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected doubleTap(events: IEventsUI): IElementsReturn {
 
-		const tap = `
-		<div class="double-tap-container ${uiClasses.doubleTap} ${uiClasses.doubleTapLeft}" data-tap="left">
-		  <div class="double-tap-icon-wrap">
-			<img src="${this.icons}/fast-forward.svg" class="rot-180" alt="tap-left"> 
-			<div>${this.timeTrackOffset || ""}</div>
-		  </div>
-		</div>
-		<div class="double-tap-container ${uiClasses.doubleTap} ${uiClasses.doubleTapRight}" data-tap="right">
-		  <div class="double-tap-icon-wrap">
-			<div>${this.timeTrackOffset || ""}</div>
-			<img src="${this.icons}/fast-forward.svg" alt="tap-right">  
-		  </div>
-		</div>
-	`;
+		const double_tab_left_node = document.createElement("div");
+		double_tab_left_node.classList.add('double-tap-container', UiClasses.doubleTap, UiClasses.doubleTapLeft);
+		double_tab_left_node.dataset.tap = "left";
+		double_tab_left_node.innerHTML = `
+			<div class="double-tap-icon-wrap">
+				<img src="${this.icons}/fast-forward.svg" class="rot-180" alt="tap-left"> 
+				<div>${this.timeTrackOffset || ""}</div>
+	  		</div>
+		`;
 
-		this.container?.insertAdjacentHTML('beforeend', tap);
+		const double_tab_right_node = document.createElement("div");
+		double_tab_right_node.classList.add('double-tap-container', UiClasses.doubleTap, UiClasses.doubleTapRight);
+		double_tab_right_node.dataset.tap = "right";
+		double_tab_right_node.innerHTML = `
+			<div class="double-tap-icon-wrap">
+				<div>${this.timeTrackOffset || ""}</div>
+				<img src="${this.icons}/fast-forward.svg" alt="tap-right">  
+	  		</div>
+		`;
 
-		this.unMountList["_doubleTap"] = () => {
-			const tapLeft = this.container?.querySelector(`.${uiClasses.doubleTapLeft}`);
-			const tapRight = this.container?.querySelector(`.${uiClasses.doubleTapRight}`);
-			tapLeft?.remove();
-			tapRight?.remove();
-		}
 
+		this.container?.append(double_tab_right_node, double_tab_left_node);
 		return {
-			remove: this.unMountList["_doubleTap"],
-			class: "double-tap-container",
-			ui: Object.values(uiClasses),
-			dom_elements: {}
+			remove: () => {
+				double_tab_left_node.remove();
+				double_tab_right_node.remove();
+			},
+			dom_elements: {
+				double_tab_right_node,
+				double_tab_left_node
+			}
 		};
 
 	}
 
-	protected overlayPlay(events: IEventsUI): IElementsReturn {
+	overlayPlay(events: IEventsUI): IElementsReturn {
 		const overlay_node = document.createElement("div");
 		overlay_node.classList.add('overlay-play', UiClasses.videoContainerOverlay);
 		const overlay_btn_play = document.createElement("div");
@@ -331,7 +332,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		};
 	}
 
-	protected storeTimeBtn(events: IEventsUI): IElementsReturn {
+	storeTimeBtn(events: IEventsUI): IElementsReturn {
 		const store_time_node = document.createElement("div");
 		store_time_node.classList.add(UiClasses.playToTimeContainer);
 		store_time_node.style.display = !this.storeTime ? "none" : "block";
@@ -356,36 +357,17 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 	}
 
 	controls(container: HTMLDivElement | null, events: IEventsUI): IElementsReturn {
-		const className = 'videoPlayerControls';
-		const uiClasses = {
-			play: UiClasses.play,
-			pause: UiClasses.pause,
-			fullscreen: UiClasses.fullscreen,
-			fullscreenCancel: UiClasses.fullscreenCancel,
-			buffer: UiClasses.buffer,
-			progress: UiClasses.progress,
-			track: UiClasses.track,
-			volume: UiClasses.volume,
-			rangeVolume: UiClasses.rangeVolume,
-			rangeVolumeContainer: UiClasses.volumeProgressContainer,
-			videoPlayerControls: UiClasses.videoPlayerControls,
-			trackTime: UiClasses.trackTime,
-			timeFull: UiClasses.trackTimeFull,
-			subtitleItem: UiClasses.subtitleItem,
-			cc: UiClasses.subtitleBtn,
-		};
-
-		const actions_pp = this.play(uiClasses.play, uiClasses.pause, events);
+		const actions_pp = this.play(UiClasses.play, UiClasses.pause, events);
 
 		const controls = document.createElement("div");
-		controls.classList.add("video-player-controls", className)
+		controls.classList.add("video-player-controls", 'videoPlayerControls')
 		controls.style.display = 'none';
 
 		const playerBtnLeft = document.createElement("div");
 		playerBtnLeft.classList.add("player-btn-left");
 		playerBtnLeft.appendChild(actions_pp.dom_elements.buttons_pp_action);
 
-		const track = this.track(uiClasses.track, uiClasses.progress, uiClasses.buffer, uiClasses.trackTime, uiClasses.timeFull);
+		const track = this.track(UiClasses.track, UiClasses.progress, UiClasses.buffer, UiClasses.trackTime, UiClasses.trackTimeFull);
 
 		const playerBtnRight = document.createElement("div");
 		playerBtnRight.classList.add("player-btn-right");
@@ -396,15 +378,15 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 
 		let subtitles_node_elements: { [key: string]: HTMLElement } = {};
 		if (this.subtitlesInit === true) {
-			const subtitles_node = this.subtitles({ btn: uiClasses.cc, cItem: uiClasses.subtitleItem, listTrack: UiClasses.subtitleList, track: this.subtitlesList })
+			const subtitles_node = this.subtitles({ btn: UiClasses.subtitleBtn, cItem: UiClasses.subtitleItem, listTrack: UiClasses.subtitleList, track: this.subtitlesList })
 			subtitles_node_elements = { ...subtitles_node.dom_elements };
 			playerBtnRight.appendChild(subtitles_node_elements.subtitle_container_node);
 		}
 
-		const fullscreen = this.fullscreen(uiClasses.fullscreen, uiClasses.fullscreenCancel)
+		const fullscreen = this.fullscreen(UiClasses.fullscreen, UiClasses.fullscreenCancel)
 		playerBtnRight.appendChild(fullscreen.dom_elements.fullscreen_container_node);
 
-		const volume = this.volume({ btn: uiClasses.volume, volume: uiClasses.rangeVolume, range: uiClasses.rangeVolumeContainer });
+		const volume = this.volume({ btn: UiClasses.volume, volume: UiClasses.rangeVolume, range: UiClasses.volumeProgressContainer });
 		playerBtnRight.appendChild(volume.dom_elements.volume_container_node);
 
 		controls.appendChild(playerBtnRight);
@@ -416,6 +398,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 				actions_pp.remove();
 				track.remove();
 				volume.remove();
+				fullscreen.remove();
 				controls.remove();
 			},
 			dom_elements: {
@@ -430,11 +413,18 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 	}
 
 	createUI = (events: IEventsUI): IVideoPlayerElementsCreate => {
-		return {
+		const elements: { [key: string]: IElementsReturn } = {
 			controls: this.controls(this.container, events),
 			overlay: this.overlayPlay(events),
-			doubleTap: this.doubleTap(),
+			doubleTap: this.doubleTap(events),
 			timeStore: this.storeTimeBtn(events)
 		};
+
+		Object.keys(elements).forEach(key_element => {
+			const value = elements[key_element].remove;
+			this.unMountList.push(value);
+		})
+
+		return elements;
 	};
 }

@@ -18,8 +18,8 @@ export class VideoUtils implements IVideoUtils {
 	fadeIn({ el, display = 'block', time = 10, callback }: IFade) {
 		el.style.opacity = '0';
 		el.style.display = display || 'block';
-
 		(function fade() {
+			//console.log("fadeIn fade", el);
 			let val: number = parseFloat(el.style.opacity);
 			if ((val += time / 1000) < 1.01) {
 				el.style.opacity = val.toString();
@@ -35,13 +35,14 @@ export class VideoUtils implements IVideoUtils {
 	fadeOut({ el, time = 10, callback = undefined }: IFade) {
 		el.style.opacity = '1';
 		(function fade() {
-			const opacity = parseInt(el.style.opacity) - (time / 1000)
+			const opacity = Number(el.style.opacity) - (time / 1000);
 			if (opacity < 0) {
 				el.style.display = 'none';
 				if (callback !== undefined) {
 					callback();
 				}
 			} else {
+				el.style.opacity = opacity.toString();
 				requestAnimationFrame(fade);
 			}
 		})();

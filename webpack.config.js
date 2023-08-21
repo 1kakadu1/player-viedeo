@@ -2,6 +2,7 @@ const path = require('path');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = ({ development, serve }) => {
     console.log("++++++++++++");
@@ -107,6 +108,15 @@ module.exports = ({ development, serve }) => {
                 // },
             ],
         },
-        plugins: [new ESLintPlugin({ extensions: ['ts'] }), new HtmlWebpackPlugin({ template: './src/index.html', minify: false }), new MiniCssExtractPlugin({ filename: '[name].css' })],
+        plugins: [
+            new ESLintPlugin({ extensions: ['ts'] }),
+            new HtmlWebpackPlugin({ template: './src/index.html', minify: false }),
+            new MiniCssExtractPlugin({ filename: '[name].css' }),
+            new CopyPlugin(
+                {
+                    patterns: [
+                        { from: 'src/public', to: 'public' }
+                    ],
+                })],
     }
 };

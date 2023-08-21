@@ -272,15 +272,12 @@ export class VideoPlayer {
 
 		const videoStart = () => {
 			this.isPlay = true;
-			console.log("aaaaa", this.controls, this.overlay.overlay_node);
 			this.utils.fadeOutIN(this.btnPause, this.btnPlay, FadeTime.controls, this.controlsUI);
 			this.utils.fadeOut({
 				el: this.dom_elements["timeStore"].dom_elements["store_time_node"],
 				time: FadeTime.controls
 			});
 			if (!this.isTrack) {
-				console.log("12123");
-
 				this.utils.fadeOutIN(this.controls, this.overlay.overlay_node, 40, { display: 'flex' })
 			}
 			this.isTrack = false;

@@ -15,7 +15,7 @@ videoList.forEach((item) => {
 	const itemElement = item as HTMLDivElement
 	const videoPlayer = new VideoPlayer({
 		videoContainer: `.${itemElement.dataset.name}`,
-		iconsFolder: './assets/images/icons',
+		iconsFolder: './public/images/icons',
 		volumeValue: 30,
 		subtitle: !!videoSubtitles.length,
 		timeTrackOffset: 2
