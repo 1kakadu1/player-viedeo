@@ -47,7 +47,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		cItem: string;
 		listTrack: string;
 		track: NodeListOf<HTMLTrackElement> | null;
-	}) {
+	}, events: IEventsUI) {
 		const trackList = () => {
 			const items = [];
 
@@ -81,17 +81,22 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		const subtitle_list_items_obj: { [key: string]: HTMLDivElement } = {};
 		subtitle_list_items.forEach(item => {
 			subtitle_list_items_obj["subtitle_list_item_" + item.dataset.lang] = item;
+			subtitle_list.appendChild(item);
 		});
 
 		const subtitle_btn = document.createElement("button");
 		subtitle_btn.classList.add('btn-cc', 'controls-btn', btn);
 		subtitle_btn.innerText = 'CC';
+		subtitle_btn.addEventListener('click', events['subtitle_btn'], false);
+		subtitle_list.addEventListener('click', events['subtitle_list'], false);
 
 		subtitle_container_node.appendChild(subtitle_list);
 		subtitle_container_node.appendChild(subtitle_btn);
 
 		return {
 			remove: () => {
+				subtitle_btn.removeEventListener('click', events['subtitle_btn'], false);
+				subtitle_list.removeEventListener('click', events['subtitle_list'], false);
 				subtitle_container_node.remove();
 			},
 			dom_elements: {
@@ -103,7 +108,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		};
 	}
 
-	protected volume({ btn, volume, range }: IVolumeClasses) {
+	protected volume({ btn, volume, range }: IVolumeClasses, events: IEventsUI) {
 		const volume_container_node = document.createElement('div');
 		volume_container_node.classList.add("player-btn-pp", "player-volume-container");
 
@@ -118,6 +123,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		volume_range_input.name = 'volume';
 		volume_range_input.min = '0';
 		volume_range_input.max = '100';
+		volume_range_input.addEventListener("input", events["volume"], false);
 
 		const volume_range_label = document.createElement('div');
 		volume_range_label.classList.add("player-volume-label");
@@ -126,6 +132,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		const volume_button = document.createElement('button');
 		volume_button.classList.add('controls-btn', btn);
 		volume_button.innerHTML = `<img src="${this.icons}/volume.svg" alt="volume">`;
+		volume_button.addEventListener("click", events["volume_toggle"], false);
 
 		volume_range_node.appendChild(volume_range_input);
 		volume_range_node.appendChild(volume_range_label);
@@ -135,6 +142,8 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 
 		return {
 			remove: () => {
+				volume_button.removeEventListener("click", events["volume_toggle"], false);
+				volume_range_input.removeEventListener("input", events["volume"], false);
 				volume_container_node.remove();
 			},
 			dom_elements: {
@@ -147,7 +156,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		};
 	}
 
-	protected fullscreen = (on: string, off: string) => {
+	protected fullscreen = (on: string, off: string, events: IEventsUI) => {
 		const fullscreen_container_node = document.createElement("div");
 		fullscreen_container_node.classList.add("player-btn-pp");
 		const fullscreen_on = document.createElement("button");
@@ -157,11 +166,15 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		fullscreen_off.innerHTML = `<img src="${this.icons}/fullscreen-off.svg" alt="fullscreen off">`;
 		fullscreen_off.classList.add('controls-btn', off);
 		fullscreen_off.style.display = "none";
+		fullscreen_off.addEventListener("click", events["fullscreen_off"]);
+		fullscreen_on.addEventListener("click", events["fullscreen_on"]);
 
 		fullscreen_container_node.append(fullscreen_on, fullscreen_off)
 
 		return {
 			remove: () => {
+				fullscreen_off.addEventListener("click", events["fullscreen_off"]);
+				fullscreen_on.addEventListener("click", events["fullscreen_on"]);
 				fullscreen_container_node.remove();
 			},
 			dom_elements: {
@@ -213,7 +226,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 
 	}
 
-	protected track(container: string, progress: string, buffer: string, time: string, timeFull: string) {
+	protected track(container: string, progress: string, buffer: string, time: string, timeFull: string, events: IEventsUI) {
 		const track_container_node = document.createElement('div');
 		track_container_node.classList.add("player-track-container");
 
@@ -226,6 +239,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 
 		const track_sp = document.createElement('span');
 		track_sp.classList.add('player-track-time_sp');
+		track_sp.innerText = '/';
 
 		const track_time_full = document.createElement('span');
 		track_time_full.classList.add(timeFull);
@@ -238,6 +252,8 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 
 		const track_player = document.createElement('div');
 		track_player.classList.add("player-track", container);
+		track_player.addEventListener("click", events['track'], false);
+
 		track_container_node.appendChild(track_player);
 
 		const track_buffered = document.createElement('div');
@@ -256,6 +272,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 
 		return {
 			remove: () => {
+				track_player.removeEventListener("click", events['track'], false);
 				track_container_node.remove();
 			},
 			dom_elements: {
@@ -336,16 +353,18 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		const store_time_node = document.createElement("div");
 		store_time_node.classList.add(UiClasses.playToTimeContainer);
 		store_time_node.style.display = !this.storeTime ? "none" : "block";
+		store_time_node.addEventListener("click", events["store_time_btn"]);
 		const store_time_btn = document.createElement("div");
 		store_time_btn.classList.add('play-icon', UiClasses.playToTime);
 		store_time_btn.innerText = `start ${this.utils.secondsToHms(this.storeTime).time}`;
-		store_time_btn.addEventListener("click", events["store_time_btn"], false);
+
+
 		store_time_node.appendChild(store_time_btn);
 		this.container?.appendChild(store_time_node);
 
 		return {
 			remove: () => {
-				store_time_btn.removeEventListener("click", events["store_time_btn"], false);
+				store_time_node.removeEventListener("click", events["store_time_btn"]);
 				store_time_node.remove();
 			},
 			dom_elements: {
@@ -367,7 +386,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		playerBtnLeft.classList.add("player-btn-left");
 		playerBtnLeft.appendChild(actions_pp.dom_elements.buttons_pp_action);
 
-		const track = this.track(UiClasses.track, UiClasses.progress, UiClasses.buffer, UiClasses.trackTime, UiClasses.trackTimeFull);
+		const track = this.track(UiClasses.track, UiClasses.progress, UiClasses.buffer, UiClasses.trackTime, UiClasses.trackTimeFull, events);
 
 		const playerBtnRight = document.createElement("div");
 		playerBtnRight.classList.add("player-btn-right");
@@ -378,15 +397,15 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 
 		let subtitles_node_elements: { [key: string]: HTMLElement } = {};
 		if (this.subtitlesInit === true) {
-			const subtitles_node = this.subtitles({ btn: UiClasses.subtitleBtn, cItem: UiClasses.subtitleItem, listTrack: UiClasses.subtitleList, track: this.subtitlesList })
+			const subtitles_node = this.subtitles({ btn: UiClasses.subtitleBtn, cItem: UiClasses.subtitleItem, listTrack: UiClasses.subtitleList, track: this.subtitlesList }, events)
 			subtitles_node_elements = { ...subtitles_node.dom_elements };
 			playerBtnRight.appendChild(subtitles_node_elements.subtitle_container_node);
 		}
 
-		const fullscreen = this.fullscreen(UiClasses.fullscreen, UiClasses.fullscreenCancel)
+		const fullscreen = this.fullscreen(UiClasses.fullscreen, UiClasses.fullscreenCancel, events)
 		playerBtnRight.appendChild(fullscreen.dom_elements.fullscreen_container_node);
 
-		const volume = this.volume({ btn: UiClasses.volume, volume: UiClasses.rangeVolume, range: UiClasses.volumeProgressContainer });
+		const volume = this.volume({ btn: UiClasses.volume, volume: UiClasses.rangeVolume, range: UiClasses.volumeProgressContainer }, events);
 		playerBtnRight.appendChild(volume.dom_elements.volume_container_node);
 
 		controls.appendChild(playerBtnRight);

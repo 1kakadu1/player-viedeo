@@ -87,5 +87,5 @@ export interface IVideoPlayer {
 
 
 export interface IEventsUI {
-    [key: string]: (e: unknown) => void
+    [key: string]: (e: unknown | Event) => void
 }
