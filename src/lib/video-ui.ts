@@ -1,9 +1,9 @@
 import { UiClasses } from "../models/enum";
 import { IElementsReturn, IEventsUI, IVideoPlayerElementsCreate, IVideoPlayerUI, IVideoPlayerUIParam, IVolumeClasses } from "../models/video";
 import { IVideoUtils } from "../models/video-utils";
-import { VideoUtils } from "./utils";
+import VideoUtils from "./utils";
 
-export class VideoPlayerUI implements IVideoPlayerUI {
+class VideoPlayerUI implements IVideoPlayerUI {
 
 	protected container: HTMLDivElement | null;
 	protected volumeValue: number;
@@ -63,7 +63,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 				const subtitles_track_item = document.createElement('div');
 				subtitles_track_item.classList.add('subtitle-item', cItem, 'active');
 				subtitles_track_item.dataset.lang = 'off';
-				subtitles_track_item.innerText = 'Выкл.';
+				subtitles_track_item.innerText = 'Off';
 				items.push(subtitles_track_item);
 			}
 
@@ -290,7 +290,7 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		}
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	protected doubleTap(events: IEventsUI): IElementsReturn {
 
 		const double_tab_left_node = document.createElement("div");
@@ -313,10 +313,15 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 	  		</div>
 		`;
 
+		double_tab_left_node?.addEventListener("touchstart", events["tap_handler"], false);
+		double_tab_right_node?.addEventListener("touchstart", events["tap_handler"], false);
+
 
 		this.container?.append(double_tab_right_node, double_tab_left_node);
 		return {
 			remove: () => {
+				double_tab_left_node?.removeEventListener("touchstart", events["tap_handler"], false);
+				double_tab_right_node?.removeEventListener("touchstart", events["tap_handler"], false);
 				double_tab_left_node.remove();
 				double_tab_right_node.remove();
 			},
@@ -447,3 +452,5 @@ export class VideoPlayerUI implements IVideoPlayerUI {
 		return elements;
 	};
 }
+
+export default VideoPlayerUI;

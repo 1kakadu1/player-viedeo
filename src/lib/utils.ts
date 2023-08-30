@@ -2,7 +2,7 @@ import { Browser, PlayerKey } from "../models/enum";
 import { IBrowser, IFade } from "../models/video";
 import { IVideoUtils } from "../models/video-utils";
 
-export class VideoUtils implements IVideoUtils {
+class VideoUtils implements IVideoUtils {
 
 	private navigator = window.navigator;
 	private event;
@@ -19,7 +19,6 @@ export class VideoUtils implements IVideoUtils {
 		el.style.opacity = '0';
 		el.style.display = display || 'block';
 		(function fade() {
-			//console.log("fadeIn fade", el);
 			let val: number = parseFloat(el.style.opacity);
 			if ((val += time / 1000) < 1.01) {
 				el.style.opacity = val.toString();
@@ -133,3 +132,5 @@ export class VideoUtils implements IVideoUtils {
 	}
 
 }
+
+export default VideoUtils;

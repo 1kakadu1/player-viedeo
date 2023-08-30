@@ -6,8 +6,7 @@ declare global {
         mozFullScreenElement?: Element;
         msFullscreenElement?: Element;
         webkitFullscreenElement?: Element;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment 
-        //pictureInPictureEnabled: any;
+        //pictureInPictureEnabled: boolean;
     }
 
     interface HTMLDivElement {

@@ -2,10 +2,10 @@
 import { Browser, FadeTime, IVideoPlayerDefaultConst, PlayerKey, UiClasses } from "../models/enum";
 import { IBrowser, IPlayerStoreTime, IUi, IVideoPlayer, IVideoPlayerElementsCreate, IVideoPlayerUI, IVideoPlayerUIParam } from "../models/video";
 import { IVideoUtils } from "../models/video-utils";
-import { VideoUtils } from "./utils";
-import { VideoPlayerUI } from "./video-ui";
+import VideoUtils from "./utils";
+import VideoPlayerUI from "./video-ui";
 
-export class VideoPlayer {
+class VideoPlayer {
 	private video: HTMLVideoElement | null;
 	private videoContainer: HTMLDivElement | null;
 	private controlsUI!: IUi;
@@ -78,7 +78,6 @@ export class VideoPlayer {
 		this._onChangeProgressVideo = this._onChangeProgressVideo.bind(this);
 		this._onEventKeywords = this._onEventKeywords.bind(this);
 		this._onMouse = this._onMouse.bind(this);
-		// this._onTouch = this._onTouch.bind(this);
 	}
 
 	get videoElement() {
@@ -174,7 +173,6 @@ export class VideoPlayer {
 		}
 
 		const store_time_btn = () => {
-			console.log("store_time_btn");
 			this.playTo(this.timeStore);
 		}
 
@@ -281,28 +279,6 @@ export class VideoPlayer {
 					this.utils.fadeOut({ el: this.controls_elements['subtitle_list'], time: FadeTime.subtitle });
 				}
 			}
-
-			// if (this.video && this.videoContainer) {
-			// 	const oldEl = this.videoContainer.querySelector('.' + UiClasses.subtitleItem + '.active');
-			// 	const video = this.video;
-			// 	oldEl?.classList.remove('active');
-			// 	el.classList.add('active');
-
-			// 	if (lang === 'off') {
-			// 		if (this.subtitlesIndex !== -1) this.video.textTracks[this.subtitlesIndex].mode = 'disabled';
-			// 		this.subtitlesIndex = -1;
-			// 	} else {
-			// 		if (this.subtitlesIndex !== -1) this.video.textTracks[this.subtitlesIndex].mode = 'disabled';
-
-			// 		const key = Object.values(video.textTracks).findIndex((x) => x.language === lang);
-			// 		video.textTracks[key].mode = 'showing';
-			// 		this.subtitlesIndex = key;
-			// 	}
-			// 	const list = this.videoContainer.querySelector('.' + UiClasses.subtitleList);
-			// 	if (list) {
-
-			// 	}
-			// }
 		}
 		const subtitle_btn = () => {
 			const list = this.controls_elements['subtitle_list'];
@@ -313,6 +289,39 @@ export class VideoPlayer {
 			} else {
 				this.utils.fadeOut({ el: list, time: FadeTime.subtitle });
 			}
+		}
+
+		const tap_handler = (event: unknown) => {
+			if (event instanceof TouchEvent) {
+				const target = event.target as HTMLElement;
+				const tap: string | undefined = target.dataset.tap;
+				if (tap) {
+					if (!this.tapedTwice) {
+						this.tapedTwice = true;
+						setTimeout(() => { this.tapedTwice = false; }, 300);
+						return false;
+					}
+					event.preventDefault();
+					target.classList.add("tap-active");
+
+					setTimeout(() => {
+						target.classList.remove("tap-active")
+					}, 500);
+
+
+
+					if (this.video && this.isPlay && tap === "right") {
+						this.video.currentTime += this.timeTrackOffset;
+					}
+
+					if (this.video && this.isPlay && tap === "left") {
+						this.video.currentTime -= this.timeTrackOffset;
+					}
+				}
+
+			}
+
+
 		}
 
 		return {
@@ -326,7 +335,8 @@ export class VideoPlayer {
 			fullscreen_on,
 			track,
 			subtitle_btn,
-			subtitle_list
+			subtitle_list,
+			tap_handler
 		}
 
 	}
@@ -371,15 +381,12 @@ export class VideoPlayer {
 
 	playerInit = (callback?: (params?: unknown) => void) => {
 		if (!this.checkError() && this.video) {
-			console.log(this.dom_elements);
 			this.destroyObject['overlay'] = this.dom_elements['overlay']['remove'];
 			this.destroyObject['_onChangeProgressVideo'] = this._onChangeProgressVideo();
 			this.destroyObject['_onChangePip'] = this._onChangePip();
 			this.destroyObject['_onChangeFullScreen'] = this._onChangeFullScreen();
 			this.destroyObject['_onEventKeywords'] = this._onEventKeywords();
 			this.destroyObject['_onMouse'] = this._onMouse();
-			// this.unMountObject['_onTouch'] = this._onTouch();
-			console.log(this.dom_elements);
 			this.video.volume = this.volumeValue / 100;
 
 			if (callback) {
@@ -468,12 +475,13 @@ export class VideoPlayer {
 		const video = this.video as HTMLVideoElement;
 
 		const onEnterpictureinpicture = () => {
-			video.pause();
-			this.utils.fadeOutIN(this.btnPlay, this.btnPause, FadeTime.controls,);
+			//video.pause();
+			//this.utils.fadeOutIN(this.btnPlay, this.btnPause, FadeTime.controls,);
 		};
+
 		const onLeavepictureinpicture = () => {
-			video.pause();
-			this.utils.fadeOutIN(this.btnPlay, this.btnPause, FadeTime.controls, this.controlsUI);
+			//video.pause();
+			//this.utils.fadeOutIN(this.btnPlay, this.btnPause, FadeTime.controls, this.controlsUI);
 		};
 
 		if (document.pictureInPictureEnabled) {
@@ -633,3 +641,5 @@ export class VideoPlayer {
 	}
 
 }
+
+export default VideoPlayer;
