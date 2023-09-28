@@ -37,6 +37,52 @@ class VideoPlayerUI implements IVideoPlayerUI {
 		})
 	};
 
+	
+	protected playbackRate({btn}:{btn:string}, events: IEventsUI): IElementsReturn{
+
+		const speed_list_items_obj: { [key: string]: HTMLDivElement } = {};
+
+		const speed_container_node = document.createElement("div");
+		speed_container_node.classList.add("player-btn-pp", 'player-subtitle-container', 'player-speed-container');
+
+		const speed_list = document.createElement("div");
+		speed_list.classList.add("subtitle-list","speed-list");
+		speed_list.style.display = 'none';
+
+
+		[0.5,0.75,1,1.5, 1.75 ,2].forEach((item, index)=> {
+			const speed_item = document.createElement('div');
+			speed_item.classList.add('subtitle-item', "speed-item", item === 1 ? "active":"skip");
+			speed_item.dataset.speed = item.toString();
+			speed_item.innerText =  item.toString();
+			speed_list_items_obj["speed_list_item_" + index] = speed_item;
+			speed_list.appendChild(speed_item);
+		});
+
+		const speed_btn = document.createElement("button");
+		speed_btn.classList.add('btn-cc', 'controls-btn', btn);
+		speed_btn.innerText = '>>';
+		speed_btn.addEventListener('click', events['speed_btn'], false);
+		speed_list.addEventListener('click', events['speed_list'], false);
+
+		speed_container_node.appendChild(speed_list);
+		speed_container_node.appendChild(speed_btn);
+
+
+		return {
+			remove: () => {
+				speed_btn.removeEventListener('click', events['subtitle_btn'], false);
+				speed_list.removeEventListener('click', events['subtitle_list'], false);
+				speed_container_node.remove();
+			},
+			dom_elements: {
+				speed_list,
+				speed_container_node,
+				speed_btn,
+				...speed_list_items_obj,
+			}
+		};
+	}
 	protected subtitles({
 		btn,
 		cItem,
@@ -47,7 +93,7 @@ class VideoPlayerUI implements IVideoPlayerUI {
 		cItem: string;
 		listTrack: string;
 		track: NodeListOf<HTMLTrackElement> | null;
-	}, events: IEventsUI) {
+	}, events: IEventsUI): IElementsReturn {
 		const trackList = () => {
 			const items = [];
 
@@ -401,11 +447,18 @@ class VideoPlayerUI implements IVideoPlayerUI {
 		controls.appendChild(track.dom_elements.track_container_node);
 
 		let subtitles_node_elements: { [key: string]: HTMLElement } = {};
+		let subtitles_node: IElementsReturn | null = null;
+
 		if (this.subtitlesInit === true) {
-			const subtitles_node = this.subtitles({ btn: UiClasses.subtitleBtn, cItem: UiClasses.subtitleItem, listTrack: UiClasses.subtitleList, track: this.subtitlesList }, events)
+			subtitles_node = this.subtitles({ btn: UiClasses.subtitleBtn, cItem: UiClasses.subtitleItem, listTrack: UiClasses.subtitleList, track: this.subtitlesList }, events)
 			subtitles_node_elements = { ...subtitles_node.dom_elements };
 			playerBtnRight.appendChild(subtitles_node_elements.subtitle_container_node);
 		}
+		let speed_node_elements: { [key: string]: HTMLElement } = {};
+		const speed_node = this.playbackRate({ btn: UiClasses.subtitleBtn }, events)
+		speed_node_elements = { ...speed_node.dom_elements };
+		playerBtnRight.appendChild(speed_node_elements.speed_container_node);
+		
 
 		const fullscreen = this.fullscreen(UiClasses.fullscreen, UiClasses.fullscreenCancel, events)
 		playerBtnRight.appendChild(fullscreen.dom_elements.fullscreen_container_node);
@@ -424,6 +477,10 @@ class VideoPlayerUI implements IVideoPlayerUI {
 				volume.remove();
 				fullscreen.remove();
 				controls.remove();
+				speed_node.remove();
+				if (this.subtitlesInit === true && subtitles_node !== null) {
+					subtitles_node.remove()
+				}
 			},
 			dom_elements: {
 				controls,
@@ -432,6 +489,7 @@ class VideoPlayerUI implements IVideoPlayerUI {
 				...subtitles_node_elements,
 				...fullscreen.dom_elements,
 				...volume.dom_elements,
+				...speed_node_elements,
 			}
 		};
 	}

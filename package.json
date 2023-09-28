@@ -2,9 +2,9 @@
   "name": "video",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/video-mini.js",
-  "types": "dist/video-mini.d.ts",
-  "module": "dist/video-mini.js",
+  "main": "dist/video_mini.js",
+  "types": "dist/video_mini.d.ts",
+  "module": "dist/video_mini.js",
   "prepublish": "npm run build && npm run test",
   "scripts": {
     "serve": "webpack serve --mode development --env development serve --progress",

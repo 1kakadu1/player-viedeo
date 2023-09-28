@@ -10,14 +10,14 @@ module.exports = ({ development, serve }) => {
     console.log("++++++++++++");
     return {
         target: "web",
-        entry: serve ? './src/main.ts' : './src/video-mini.ts',
+        entry: serve ? './src/main.ts' : './src/video_mini.ts',
         devtool: development ? 'inline-source-map' : false,
         mode: development ? 'development' : 'production',
         output: {
-            filename: serve ? 'main.js' : 'video-mini.js',
+            filename: serve ? 'main.js' : 'video_mini.js',
             path: path.resolve(__dirname, 'dist'),
             //publicPath: 'dist',
-            library: serve ? 'main' : 'video-mini',
+            library: serve ? 'main' : 'video_mini',
             libraryExport: 'default',
             libraryTarget: 'umd',
             umdNamedDefine: true,

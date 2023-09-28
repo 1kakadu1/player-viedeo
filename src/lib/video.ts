@@ -17,6 +17,7 @@ class VideoPlayer {
 	private iconsFolder: string;
 	private subtitles: NodeListOf<HTMLTrackElement> | null;
 	private isSubtitles: boolean = false;
+	private isSpeed: boolean = false;
 	private isTrack: boolean = false;
 	private ui?: IVideoPlayerUI;
 	private timeTrackOffset: number;
@@ -32,6 +33,7 @@ class VideoPlayer {
 	private utils: IVideoUtils;
 	private dom_elements: IVideoPlayerElementsCreate = {};
 	private activeLang: string | 'off' = "off";
+	private activeSpeed: number = 1;
 
 	constructor({ videoContainer, iconsFolder, volumeValue, subtitle, timeTrackOffset: timeTrackOffset, videoPlayerUI, storeTimeOffset }: IVideoPlayer) {
 		this.videoContainer = document.querySelector(videoContainer);
@@ -62,8 +64,9 @@ class VideoPlayer {
 			this.browser = this.utils.userAgent();
 			container.classList.add(this.browser.class);
 			this.dom_elements = this.ui.createUI({ ...this._events() });
-
+			
 			if (this.video && this.video.textTracks && this.subtitles && this.subtitles.length > 0) {
+				//this.video.playbackRate = 1;
 				for (let i = 0; i < this.video.textTracks.length; i++) {
 					this.video.textTracks[i].mode = "hidden";
 				}
@@ -291,6 +294,34 @@ class VideoPlayer {
 			}
 		}
 
+
+		const speed_list = (event: unknown) => {
+			if (event instanceof MouseEvent) {
+				const el = event.target as HTMLElement;
+				const speed = el.dataset.speed || '1';
+				
+				if (this.activeSpeed != Number(speed) && this.video ) {
+					this.controls_elements['speed_list'].querySelector(`div[data-speed='${this.activeSpeed}']`)?.classList.remove("active")
+					el.classList.add('active');
+					this.activeSpeed = Number(speed);
+					this.isSpeed = false;
+					this.video.playbackRate = this.activeSpeed;
+					this.utils.fadeOut({ el: this.controls_elements['speed_list'], time: FadeTime.subtitle });
+				}
+			}
+		}
+
+		const speed_btn = () => {
+			const list = this.controls_elements['speed_list'];
+			this.isSpeed = !this.isSpeed;
+
+			if (this.isSpeed) {
+				this.utils.fadeIn({ el: list, time: FadeTime.subtitle });
+			} else {
+				this.utils.fadeOut({ el: list, time: FadeTime.subtitle });
+			}
+		}
+
 		const tap_handler = (event: unknown) => {
 			if (event instanceof TouchEvent) {
 				const target = event.target as HTMLElement;
@@ -336,7 +367,9 @@ class VideoPlayer {
 			track,
 			subtitle_btn,
 			subtitle_list,
-			tap_handler
+			tap_handler,
+			speed_btn,
+			speed_list
 		}
 
 	}

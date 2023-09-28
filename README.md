@@ -35,16 +35,16 @@ Connect the script and styles. Prepare images for the control panel (you can tak
 
 Initializing vanilla js (browser):
 ```
-<script defer src="video-mini.js"></script>
+<script src="./video_mini.js"></script>
 <script>
-    const { VideoPlayer } = window['video-mini'];
+    const { VideoPlayer } = window['video_mini'];
     const video = new VideoPlayer({
     videoContainer: '.player-container',
     iconsFolder: './assets/images/icons',
     volumeValue: 50,
     subtitle: true,
     timeTrackOffset: 2,
-    videoPlayerUI: function(videoContainer: HTMLDivElement | null, param: IVideoPlayerUIParam){
+    videoPlayerUI: function(videoContainer, param){
         return new MyPlayerUI(videoContainer,{...param})
     }
     });
@@ -54,7 +54,7 @@ Initializing vanilla js (browser):
 ```
 Initializing multiple videos:
 ```
-import {  VideoPlayer, VideoUtils} from './video-mini';
+import {  VideoPlayer, VideoUtils} from './video_mini';
 
 const videoStack = {};
 const videoList = document.querySelectorAll(".video-list .player-container");

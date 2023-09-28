@@ -1,5 +1,5 @@
 import './styles/main.sass';
-import { VideoPlayer, VideoUtils } from "./video-mini";
+import { VideoPlayer, VideoUtils } from "./video_mini";
 interface IStackVideo {
 	[key: string]: VideoPlayer
 }
